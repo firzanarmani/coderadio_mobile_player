@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 
 void main() => runApp(CodeRadioApp());
 
@@ -37,6 +38,34 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  AudioPlayer _player;
+  bool _isPlaying = false;
+
+  void _play() async {
+    // TODO: Fetch available path
+    _player = AudioPlayer();
+    String _streamPath =
+        "https://coderadio-admin.freecodecamp.org/radio/8010/radio.mp3";
+    await _player.setUrl(_streamPath);
+    _player.play();
+  }
+
+  void _stop() async {
+    await _player.stop();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _player = AudioPlayer();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _player.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,15 +76,19 @@ class _HomePageState extends State<HomePage> {
             style: TextStyle(color: Color.fromARGB(255, 10, 10, 35))),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Play',
-            ),
-          ],
-        ),
-      ),
+          child: IconButton(
+        icon: _isPlaying ? Icon(Icons.stop) : Icon(Icons.play_arrow),
+        onPressed: () {
+          if (_isPlaying) {
+            _stop();
+          } else {
+            _play();
+          }
+          setState(() {
+            _isPlaying = !_isPlaying;
+          });
+        },
+      )),
     );
   }
 }
