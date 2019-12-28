@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
+
+enum PlayerStatus { playing, stopped, loading }
 
 void main() => runApp(CodeRadioApp());
 
@@ -37,6 +40,43 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  AudioPlayer _player;
+  PlayerStatus _playerStatus = PlayerStatus.stopped;
+
+  void _play() async {
+    setState(() {
+      _playerStatus = PlayerStatus.loading;
+    });
+    // TODO: Fetch available path
+    _player = AudioPlayer();
+    String _streamPath =
+        "https://coderadio-admin.freecodecamp.org/radio/8010/radio.mp3";
+    await _player.setUrl(_streamPath);
+    _player.play();
+    setState(() {
+      _playerStatus = PlayerStatus.playing;
+    });
+  }
+
+  void _stop() async {
+    await _player.stop();
+    setState(() {
+      _playerStatus = PlayerStatus.stopped;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _player = AudioPlayer();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _player.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,15 +87,20 @@ class _HomePageState extends State<HomePage> {
             style: TextStyle(color: Color.fromARGB(255, 10, 10, 35))),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Play',
-            ),
-          ],
-        ),
-      ),
+          child: _playerStatus == PlayerStatus.loading
+              ? CircularProgressIndicator()
+              : IconButton(
+                  icon: _playerStatus == PlayerStatus.playing
+                      ? Icon(Icons.stop)
+                      : Icon(Icons.play_arrow),
+                  onPressed: () {
+                    if (_playerStatus == PlayerStatus.playing) {
+                      _stop();
+                    } else {
+                      _play();
+                    }
+                  },
+                )),
     );
   }
 }
