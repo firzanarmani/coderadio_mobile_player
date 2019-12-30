@@ -51,9 +51,19 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   AudioPlayer _player;
   PlayerStatus _playerStatus = PlayerStatus.stopped;
+
+  // TODO: Find a better way to write this
   static Song _blankSong =
       new Song(album: "", art: "", artist: "", id: "", text: "", title: "");
+  static AudioStream _blankStream = new AudioStream(
+      bitrate: 0,
+      id: 0,
+      listeners: new Listeners(current: 0, unique: 0, total: 0),
+      name: "",
+      url: "");
   RadioInfo _initialData = new RadioInfo(
+      station: new Station(
+          id: 0, listenUrl: "", mounts: [_blankStream], relays: [_blankStream]),
       listeners: new Listeners(current: 0, unique: 0, total: 0),
       currentSong: new CurrentSong(
           duration: 0, elapsed: 0, playedAt: 0, remaining: 0, song: _blankSong),
@@ -134,7 +144,7 @@ class _HomePageState extends State<HomePage> {
                             "/" +
                             radioInfo.currentSong.duration.toString()),
                         Text(radioInfo.currentSong.song.title),
-                        Text(radioInfo.currentSong.song.artist)
+                        Text(radioInfo.currentSong.song.artist),
                       ]);
                     })
               ],
